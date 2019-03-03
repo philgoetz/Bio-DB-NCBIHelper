@@ -140,16 +140,21 @@ SKIP: {
     eval {$seq = $gb->get_Seq_by_acc("A11111");};
     skip "Couldn't connect to complete GenBank tests. Skipping those tests", 15 if $@;
     is $seq->length, 6;
-    # complexity tests
-    ok $gb = Bio::DB::GenBank->new(-format => 'Fasta', -complexity => 0);
-    eval {$seqin = $gb->get_Stream_by_acc("5");};
+
+		# complexity tests
+    ok $gb = Bio::DB::GenBank->new(-format => 'fasta', -complexity => 0);
+    eval {$seqin = $gb->get_Stream_by_acc("21614549");};
     skip "Couldn't connect to complete GenBank tests. Skipping those tests", 13 if $@;
-    @result = (1136, 'dna', 342, 'protein');
+    my @result = (4366, 'dna', 620, 'protein');
+
+		# Test number is labile (dependent on remote results)
     while ($seq = $seqin->next_seq) {
         is $seq->length, shift(@result);
         is $seq->alphabet, shift(@result);
     }
-    is @result, 0;
+
+		is(@result, 0, @result ? "Missing results:".join(",", @result) : "All results checked");
+
     # Real batch retrieval using epost/efetch
     # these tests may change if integrated further into Bio::DB::Gen*
     # Currently only useful for retrieving GI's via get_seq_stream
@@ -157,15 +162,17 @@ SKIP: {
     eval {$seqin = $gb->get_seq_stream(-uids => [4887706 ,431229, 147460], -mode => 'batch');};
     skip "Couldn't connect to complete GenBank batchmode epost/efetch tests. Skipping those tests", 8 if $@;
     my %result = ('M59757' => 12611 ,'X76083'=> 3140, 'J01670'=> 1593);
-	my $ct = 0;
+		my $ct = 0;
+
+		# Test number is labile (dependent on remote results)
     while ($seq = $seqin->next_seq) {
-		$ct++;
-		my $acc = $seq->accession;
-        ok exists $result{ $acc };
-        is $seq->length, $result{ $acc };
-		delete $result{$acc};
+			$ct++;
+			my $acc = $seq->accession;
+      ok exists $result{ $acc };
+      is $seq->length, $result{ $acc };
+			delete $result{$acc};
     }
     skip('No seqs returned', 8) if !$ct;
-	is $ct, 3;
+		is $ct, 3;
     is %result, 0;
 }
