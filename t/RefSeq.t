@@ -6,11 +6,10 @@ use strict;
 BEGIN {
     use Bio::Root::Test;
 
-    test_begin(-tests => 12,
+    test_begin(-tests => 5,
                -requires_modules => [qw(IO::String
                                         LWP::UserAgent
                                         HTTP::Request::Common)]);
-    use_ok('Bio::DB::RefSeq');
     use_ok('Bio::DB::GenBank');
 }
 
@@ -22,29 +21,15 @@ my ($db,$seq);
 $seq = undef;
 
 #test redirection from GenBank
-ok $db = Bio::DB::GenBank->new('-verbose'=> $verbose, -redirect_refseq => 1);
+ok $db = Bio::DB::GenBank->new('-verbose'=> $verbose);
 
-eval {
-    $seq = $db->get_Seq_by_acc('NT_006732');
-};
-ok $@;
+throws_ok {$seq = $db->get_Seq_by_acc('NT_006732')} qr/NT_ contigs are whole chromosome files/;
 
 SKIP: {
-    test_skip(-tests => 8, -requires_networking => 1);
+    test_skip(-tests => 2, -requires_networking => 1);
 
-    eval {
-        ok($seq = $db->get_Seq_by_acc('NM_006732'));
-        is($seq->length, 3776);
-    };
-    skip "Warning: Couldn't connect to RefSeq with Bio::DB::RefSeq.pm!", 8 if $@;
+    ok($seq = $db->get_Seq_by_acc('NM_006732'));
+    is($seq->length, 3775);
 
-    eval {
-        ok defined($db = Bio::DB::RefSeq->new(-verbose=>$verbose));
-        ok(defined($seq = $db->get_Seq_by_acc('NM_006732')));
-        is( $seq->length, 3776);
-        ok defined ($db->request_format('fasta'));
-        ok(defined($seq = $db->get_Seq_by_acc('NM_006732')));
-        is( $seq->length, 3776);
-    };
-    skip "Warning: Couldn't connect to RefSeq with Bio::DB::RefSeq.pm!", 6 if $@;
+    # Note:  Bio::DB::RefSeq-specific tests removed and placed under Bio::DB::RefSeq
 }

@@ -91,7 +91,7 @@ use Bio::DB::Query::GenBank;
 use HTTP::Request::Common;
 use URI;
 use Bio::Root::IO;
-use Bio::DB::RefSeq;
+# use Bio::DB::RefSeq;
 use URI::Escape qw(uri_unescape);
 
 use base qw(Bio::DB::WebDBSeqI Bio::Root::Root);
@@ -121,8 +121,8 @@ our $DEFAULTFORMAT = 'gb';
  Title   : new
  Usage   :
  Function: the new way to make modules a little more lightweight
- Returns : 
- Args    : 
+ Returns :
+ Args    :
 
 =cut
 
@@ -143,9 +143,9 @@ sub new {
     $strand      && $self->strand($strand);
 
     # adjust statement to accept zero value
-    defined $complexity
-        && ( $complexity >= 0 && $complexity <= 4 )
-        && $self->complexity($complexity);
+    if (defined $complexity && $complexity >= 0 && $complexity <= 4 ) {
+        $self->complexity($complexity)
+    }
     return $self;
 }
 
@@ -260,6 +260,7 @@ sub get_request {
         return $self->get_request(%qualifiers);
     }
     else {
+        #print STDERR join(",", $_, $params{$_})."\n" for keys %params;
         $url->query_form(%params);
         return GET $url;
     }
@@ -298,7 +299,7 @@ sub get_request {
   Example :
   Returns : a Bio::SeqIO stream object
   Args    : An Entrez query string or a Bio::DB::Query::GenBank object.
-            It is suggested that you create a Bio::DB::Query::GenBank object and get 
+            It is suggested that you create a Bio::DB::Query::GenBank object and get
             the entry count before you fetch a potentially large stream.
 
 =cut
@@ -378,9 +379,10 @@ sub request_format {
 =cut
 
 sub redirect_refseq {
-    my $self = shift;
-    return $self->{'_redirect_refseq'} = shift if @_;
-    return $self->{'_redirect_refseq'};
+    shift->throw(
+    "Use of redirect_refseq() is deprecated.  Bio::DB::GenBank default is to\n".
+    "always retrieve from NCBI, including RefSeq sequences.  Please use\n".
+    "Bio::DB::EMBL to retrieve records from EBI");
 }
 
 =head2 complexity
@@ -494,45 +496,11 @@ Overriding WebDBSeqI method to help newbies to retrieve sequences
 
 sub get_Stream_by_acc {
     my ( $self, $ids ) = @_;
-    my $newdb = $self->_check_id($ids);
-    if ( defined $newdb && ref($newdb) && $newdb->isa('Bio::DB::RefSeq') ) {
-        return $newdb->get_seq_stream( '-uids' => $ids, '-mode' => 'single' );
-    }
-    else {
-        return $self->get_seq_stream( '-uids' => $ids, '-mode' => 'single' );
-    }
-}
-
-=head2 _check_id
-
-  Title   : _check_id
-  Usage   :
-  Function:
-  Returns : a Bio::DB::RefSeq reference or throws
-  Args    : $id(s), $string
-
-=cut
-
-sub _check_id {
-    my ( $self, $ids ) = @_;
-
-    # NT contigs can not be retrieved
     $self->throw("NT_ contigs are whole chromosome files which are not part of regular"
-            . "database distributions. Go to ftp://ftp.ncbi.nih.gov/genomes/.") 
+            . "database distributions. Go to ftp://ftp.ncbi.nih.gov/genomes/.")
       if $ids =~ /NT_/;
-
-    # Asking for a RefSeq from EMBL/GenBank
-    if ( $self->redirect_refseq ) {
-        if ( $ids =~ /N._/ ) {
-            $self->warn(
-                "[$ids] is not a normal sequence database but a RefSeq entry."
-                    . " Redirecting the request.\n" )
-                if $self->verbose >= 0;
-            return Bio::DB::RefSeq->new();
-        }
-    }
+    return $self->get_seq_stream( '-uids' => $ids, '-mode' => 'single' );
 }
-
 
 =head2 delay_policy
 
@@ -554,8 +522,8 @@ sub delay_policy {
 
  Title   : cookie
  Usage   : ($cookie,$querynum) = $db->cookie
- Function: return the NCBI query cookie, this information is used by 
-           Bio::DB::GenBank in conjunction with efetch, ripped from 
+ Function: return the NCBI query cookie, this information is used by
+           Bio::DB::GenBank in conjunction with efetch, ripped from
            Bio::DB::Query::GenBank
  Returns : list of (cookie,querynum)
  Args    : none
@@ -577,7 +545,7 @@ sub cookie {
 
  Title   : _parse_response
  Usage   : $db->_parse_response($content)
- Function: parse out response for cookie, this is a trimmed-down version 
+ Function: parse out response for cookie, this is a trimmed-down version
            of _parse_response from Bio::DB::Query::GenBank
  Returns : empty
  Args    : none
@@ -614,9 +582,9 @@ sub _parse_response {
 
 sub no_redirect {
     shift->throw(
-    "Use of no_redirect() is deprecated.  Bio::DB::GenBank default is to always\n".
-    "retrieve from NCBI.  In order to redirect possible RefSeqs to EBI, set\n".
-    "redirect_refseq flag to 1");
+    "Use of no_redirect() is deprecated.  Bio::DB::GenBank new default is to always\n".
+    "retrieve from NCBI.  Please use Bio::DB::EMBL to retrieve records\n").
+    "from EBI";
 }
 
 1;
