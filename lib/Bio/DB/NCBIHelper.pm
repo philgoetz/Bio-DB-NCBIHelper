@@ -98,7 +98,7 @@ use base qw(Bio::DB::WebDBSeqI Bio::Root::Root);
 
 our $HOSTBASE = 'https://eutils.ncbi.nlm.nih.gov';
 our $MAX_ENTRIES = 19000;
-our $REQUEST_DELAY = 3;
+our $REQUEST_DELAY = 4;
 our %CGILOCATION = (
         'batch'   => [ 'post' => '/entrez/eutils/epost.fcgi' ],
         'query'   => [ 'get'  => '/entrez/eutils/efetch.fcgi' ],
@@ -506,8 +506,8 @@ sub get_Stream_by_acc {
 
   Title   : delay_policy
   Usage   : $secs = $self->delay_policy
-  Function: NCBI requests a delay of 3 seconds between requests. This method
-            implements that policy.
+  Function: NCBI requests a delay of 4 seconds between requests unless email is
+            provided. This method implements a 4 second delay.
   Returns : number of seconds to delay
   Args    : none
 
