@@ -130,10 +130,10 @@ sub new {
     my ( $class, @args ) = @_;
     my $self = $class->SUPER::new(@args);
     my ($seq_start, $seq_stop,   $no_redirect,
-        $redirect,  $complexity, $strand
+        $redirect,  $complexity, $strand, $email
         )
         = $self->_rearrange(
-        [ qw(SEQ_START SEQ_STOP NO_REDIRECT REDIRECT_REFSEQ COMPLEXITY STRAND) ],
+        [ qw(SEQ_START SEQ_STOP NO_REDIRECT REDIRECT_REFSEQ COMPLEXITY STRAND EMAIL) ],
         @args
         );
     $seq_start   && $self->seq_start($seq_start);
@@ -141,6 +141,7 @@ sub new {
     $no_redirect && $self->no_redirect($no_redirect);
     $redirect    && $self->redirect_refseq($redirect);
     $strand      && $self->strand($strand);
+    $email       && $self->email($email);
 
     # adjust statement to accept zero value
     if (defined $complexity && $complexity >= 0 && $complexity <= 4 ) {
@@ -193,9 +194,9 @@ sub default_format {
 sub get_request {
     my ( $self, @qualifiers ) = @_;
     my ( $mode, $uids, $format, $query, $seq_start, $seq_stop, $strand,
-        $complexity )
+        $complexity, $email)
         = $self->_rearrange(
-        [qw(MODE UIDS FORMAT QUERY SEQ_START SEQ_STOP STRAND COMPLEXITY)],
+        [qw(MODE UIDS FORMAT QUERY SEQ_START SEQ_STOP STRAND COMPLEXITY EMAIL)],
         @qualifiers );
     $mode = lc $mode;
     ($format) = $self->request_format() unless ( defined $format );
@@ -231,6 +232,7 @@ sub get_request {
     $seq_start && ( $params{'seq_start'} = $seq_start );
     $seq_stop  && ( $params{'seq_stop'}  = $seq_stop );
     $strand    && ( $params{'strand'}    = $strand );
+    $email     && ( $params{'email'}     = $email );
     if ( defined $complexity && ( $seq_start || $seq_stop || $strand ) ) {
         $self->warn(
             "Complexity set to $complexity; seq_start and seq_stop may not work!"
@@ -255,12 +257,12 @@ sub get_request {
             '-seq_stop'   => $seq_stop,
             '-strand'     => $strand,
             '-complexity' => $complexity,
-            '-format'     => $format
+            '-format'     => $format,
+            '-email'      => $email
         );
         return $self->get_request(%qualifiers);
     }
     else {
-        #print STDERR join(",", $_, $params{$_})."\n" for keys %params;
         $url->query_form(%params);
         return GET $url;
     }
@@ -478,6 +480,29 @@ sub seq_stop {
     return $self->{'_seq_stop'};
 }
 
+=head2 email
+
+ Title   : email
+ Usage   : $db->email('foo@bar.edu')
+ Function: get/set email value
+ Returns : email (string)  or undef
+ Args    : string with a valid email address; note we do not vallidate this
+           currently!
+ Throws  : if arg is not an integer or falls outside of noted range above
+ Note    : This is required if you wish to speed up mulltiple requests faster
+           than 4s per request.
+
+=cut
+
+sub email {
+    my ( $self, $email ) = @_;
+    if ( defined $email ) {
+        # TODO: validate email?
+        $self->{'_email'} =  $email;
+    }
+    return $self->{'_email'};
+}
+
 =head2 Bio::DB::WebDBSeqI methods
 
 Overriding WebDBSeqI method to help newbies to retrieve sequences
@@ -507,7 +532,9 @@ sub get_Stream_by_acc {
   Title   : delay_policy
   Usage   : $secs = $self->delay_policy
   Function: NCBI requests a delay of 4 seconds between requests unless email is
-            provided. This method implements a 4 second delay.
+            provided. This method implements a 4 second delay; use 'delay()' to
+            override, though understand if no email is provided we are not
+            responsible for users being IP-blocked by NCBI
   Returns : number of seconds to delay
   Args    : none
 
