@@ -33,7 +33,7 @@ SKIP: {
     my @ids = $query->ids;
     cmp_ok @ids, '>', 0;
     is @ids, $query->count;
-    ok $gb = Bio::DB::GenBank->new('-delay' => 0);
+    ok $gb = Bio::DB::GenBank->new();
     eval {$seqio = $gb->get_Stream_by_query($query);};
     skip "Couldn't connect to complete GenBank query tests. Skipping those tests", 5 if $@;
     my $done = 0;
@@ -57,7 +57,7 @@ SKIP: {
     my @ids = $query->ids;
     cmp_ok @ids, '>', 0;
     is @ids, $query->count;
-    $gb = Bio::DB::GenBank->new('-delay' => 0);
+    $gb = Bio::DB::GenBank->new();
     eval {$seqio = $gb->get_Stream_by_query($query);};
     skip "Couldn't connect to complete GenBank query tests. Skipping those tests: $@", 4 if $@;
     my $done = 0;

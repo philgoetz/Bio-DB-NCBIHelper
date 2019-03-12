@@ -41,7 +41,7 @@ SKIP: {
 
 $seq = $seqio = undef;
 
-ok $gb = Bio::DB::GenPept->new('-delay' => 0);
+ok $gb = Bio::DB::GenPept->new();
 SKIP: {
     eval {$seq = $gb->get_Seq_by_id('195055');};
     skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests: $@", 10 if $@;

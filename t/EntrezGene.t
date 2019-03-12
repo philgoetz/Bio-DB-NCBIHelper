@@ -11,7 +11,7 @@ BEGIN {
 }
 
 my ($gb, $seq, $seqio);
-ok $gb = Bio::DB::EntrezGene->new(-retrievaltype => 'tempfile', -delay => 0);
+ok $gb = Bio::DB::EntrezGene->new(-retrievaltype => 'tempfile');
 
 #
 # Bio::DB::EntrezGene
