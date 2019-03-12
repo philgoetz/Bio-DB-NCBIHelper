@@ -2,6 +2,10 @@ Summary of important user-visible changes for Bio-DB-NCBIHelper
 ---------------------------------------------------------------
 
 {{$NEXT}}
+  * Explicitly add Bio::SeqIO::entrezgene and LWP::Protocol::https as dependencies
+  * Actually get '-email' to work which requires overriding get_seq_stream
+  * Fix remaining delay settings in tests which are causing issues during peak 
+    NCBI times
 
 1.7.4     2019-03-10 21:29:52-05:00 America/Chicago
   * Switch away from Bio::Root::Test
