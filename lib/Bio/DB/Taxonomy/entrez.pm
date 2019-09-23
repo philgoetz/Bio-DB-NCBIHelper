@@ -167,7 +167,7 @@ sub _initialize {
 
   $self->SUPER::_initialize(@_);
 
-  my ($location,$params) = $self->_rearrange([qw(LOCATION PARAMS)],@_);
+  my ($location,$params,$email) = $self->_rearrange([qw(LOCATION PARAMS EMAIL)],@_);
 
   if( $params ) {
       if( ref($params) !~ /HASH/i ) {
@@ -176,6 +176,9 @@ sub _initialize {
       }
   } else {
       $params = \%EntrezParams;
+  }
+  if ($email) {
+      $params->{email} = $email;
   }
   $self->entrez_params($params);
   $self->entrez_url($location || $EntrezLocation );
@@ -591,7 +594,6 @@ sub entrez_params{
     }
     return %$f;
 }
-
 
 =head2 Bio::DB::WebBase methods
 
