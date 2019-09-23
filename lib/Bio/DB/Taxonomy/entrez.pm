@@ -666,6 +666,7 @@ sub _run_query {
     # Given an eutil url, run the eutil query and parse the response into an
     # XML Twig object
     my ($self, $url) = @_;
+    $self->sleep();
     my $response = $self->get($url);
     if ($response->is_success) {
         $response = $response->content;
