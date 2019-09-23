@@ -37,6 +37,7 @@ ok $query = Bio::DB::Query::GenBank->new('-db'      => 'nucleotide',
                                          '-query'   => 'Onchocerca volvulus[Organism]',
                                          '-mindate' => '2002/1/1',
                                          '-maxdate' => '2002/12/31', %params), 'Bio::DB::Query::GenBank';
+
 SKIP: {
     cmp_ok $query->count, '>', 0;
     my @ids = $query->ids;

@@ -111,6 +111,7 @@ use constant DEFAULT_DB  => 'protein';
 use constant MAXENTRY    => 100;
 
 use vars qw(@ATTRIBUTES);
+our $REQUEST_DELAY = 4;
 
 use base qw(Bio::DB::Query::WebQuery);
 
@@ -145,6 +146,8 @@ END
                      (defaults to 100)
            -email    Email address; required if you want to decrease
                      delay time between queries
+           -delay    Delay time (in seconds).  Note NCBI policy requires 4
+                     seconds between requests unless an email is provided
 
 This method creates a new query object.  Typically you will specify a
 -db and a -query argument, possibly modified by -mindate, -maxdate, or
@@ -225,6 +228,7 @@ sub cookie {
   }
 
   else {
+    $self->_sleep();
     $self->_run_query;
     @{$self}{qw(_cookie _querynum)};
   }
@@ -282,6 +286,7 @@ sub count   {
     return $d;
   }
   else {
+    $self->_sleep();
     $self->_run_query;
     return $self->{'_count'};
   }
@@ -361,6 +366,24 @@ sub _generate_id_string {
     return sprintf('%s',join('|',map {
       ($_ =~ m{^\d+$}) ? $_.'[UID]' : $_.'[PACC]'
     } @$ids));
+}
+
+=head2 delay_policy
+
+  Title   : delay_policy
+  Usage   : $secs = $self->delay_policy
+  Function: NCBI requests a delay of 4 seconds between requests unless email is
+            provided. This method implements a 4 second delay; use 'delay()' to
+            override, though understand if no email is provided we are not
+            responsible for users being IP-blocked by NCBI
+  Returns : number of seconds to delay
+  Args    : none
+
+=cut
+
+sub delay_policy {
+    my $self = shift;
+    return $REQUEST_DELAY;
 }
 
 # =head2 _sleep

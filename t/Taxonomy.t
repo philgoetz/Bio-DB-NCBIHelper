@@ -7,6 +7,13 @@ use Test::RequiresInternet;
 
 use_ok('Bio::DB::Taxonomy');
 
+my %params;
+
+if (defined $ENV{BIOPERLEMAIL}) {
+    $params{'-email'} = $ENV{BIOPERLEMAIL};
+    $params{'-delay'} = 2;
+}
+
 {
     ok my $db = Bio::DB::Taxonomy->new(-source => 'entrez');
     isa_ok $db, 'Bio::DB::Taxonomy::entrez';
