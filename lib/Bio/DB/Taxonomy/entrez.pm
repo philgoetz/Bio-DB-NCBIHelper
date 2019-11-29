@@ -101,6 +101,7 @@ Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::Taxonomy::entrez;
+
 use vars qw($EntrezLocation $UrlParamSeparatorValue %EntrezParams
             $EntrezGet $EntrezSummary $EntrezFetch %SequenceParams
             $XMLTWIG $DATA_CACHE $RELATIONS);

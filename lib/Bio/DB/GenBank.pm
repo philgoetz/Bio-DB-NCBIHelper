@@ -165,6 +165,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::GenBank;
+
 use strict;
 use vars qw(%PARAMSTRING $DEFAULTFORMAT $DEFAULTMODE);
 

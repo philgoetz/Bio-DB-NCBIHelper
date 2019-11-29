@@ -96,6 +96,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::Query::GenBank;
+
 use strict;
 use URI::Escape 'uri_unescape';
 use Bio::DB::NCBIHelper;

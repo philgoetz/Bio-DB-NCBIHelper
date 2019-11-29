@@ -85,6 +85,7 @@ preceded with a _
 # Let the code begin...
 
 package Bio::DB::NCBIHelper;
+
 use strict;
 
 use Bio::DB::Query::GenBank;

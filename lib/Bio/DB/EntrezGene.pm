@@ -93,6 +93,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::EntrezGene;
+
 use strict;
 use vars qw($DEFAULTFORMAT $DEFAULTMODE %PARAMSTRING);
 
