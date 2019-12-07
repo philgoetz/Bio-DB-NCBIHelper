@@ -387,29 +387,4 @@ sub delay_policy {
     return $REQUEST_DELAY;
 }
 
-# =head2 _sleep
-#
-#  Title   : _sleep
-#  Usage   : $self->_sleep
-#  Function: sleep for a number of seconds indicated by the delay policy
-#  Returns : none
-#  Args    : none
-#
-# NOTE: This method keeps track of the last time it was called and only
-# imposes a sleep if it was called more recently than the delay_policy()
-# allows.
-#
-# =cut
-#
-# sub _sleep {
-#    my $self = shift;
-#    my $last_invocation = $LAST_INVOCATION_TIME;
-#    if (time - $LAST_INVOCATION_TIME < $self->delay) {
-#       my $delay = $self->delay - (time - $LAST_INVOCATION_TIME);
-#       warn "sleeping for $delay seconds\n" if $self->verbose > 0;
-#       sleep $delay;
-#    }
-#    $LAST_INVOCATION_TIME = time;
-# }
-
 1;
